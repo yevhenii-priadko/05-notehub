@@ -11,13 +11,11 @@ import css from './App.module.css';
 
 export default function App() {
   // Локальні стейти для керування параметрами пошуку, пагінації та модальним вікном
+  const [localSearch, setLocalSearch] = useState<string>(''); // Для миттєвого відображення в інпуті
   const [search, setSearch] = useState<string>(''); // Рядок пошуку
   const [page, setPage] = useState<number>(1); // Поточна сторінка пагінації
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Стан відкриття модалки
 
-  // 1. АВТОМАТИЧНИЙ ЗАПИТ ДАНИХ (Заміна useEffect)
-  // Хук useQuery самостійно стежить за змінами у масиві queryKey [search, page].
-  // Як тільки змінюється сторінка або текст пошуку, він автоматично перезапускає fetchNotes.
   const { data, isLoading, isError } = useQuery({
     queryKey: ['notes', search, page],
     queryFn: () => fetchNotes(search, page),
@@ -28,8 +26,14 @@ export default function App() {
   // Затримка у 500 мс запобігає спаму бэкенду HTTP-запитами на кожен введений символ
   const debouncedSearch = useDebouncedCallback((text: string) => {
     setSearch(text);
-    setPage(1); // При кожному новому пошуковому запиті повертаємо користувача на 1 сторінку
+    setPage(1);
   }, 500);
+
+  const handleSearchChange = (text: string) => {
+    setLocalSearch(text); // Букви в інпуті з'являються МИТТЄВО
+    debouncedSearch(text); // Запит на сервер піде через 500 мс
+    setPage(1); // Скидаємо сторінку на першу
+  };
 
   // Безпечно витягуємо дані з об'єкта відповіді useQuery, задаючи дефолтні значення
   const notes = data?.notes ?? [];
@@ -39,7 +43,7 @@ export default function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         {/* Передаємо дебаунс-функцію в інпут пошуку */}
-        <SearchBox onChange={debouncedSearch} value={search} />
+        <SearchBox onChange={handleSearchChange} value={localSearch} />
 
         {/* Рендеримо пагінацію лише у випадку, якщо сторінок більше 1 (вимога ТЗ) */}
         {totalPages > 1 && (
