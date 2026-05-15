@@ -8,13 +8,13 @@ interface ResponseNotes {
 
 interface NoteInput {
   title: string;
-  content: string;
+  content: string | null;
   tag: string;
 }
 
 const BASE_URL = 'https://notehub-public.goit.study/api/notes';
 
-const myKey = import.meta.env.VITE_API_NOTE;
+const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 
 const headers = {
   accept: 'application/json',
