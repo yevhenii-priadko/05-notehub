@@ -32,7 +32,6 @@ export default function App() {
   const handleSearchChange = (text: string) => {
     setLocalSearch(text); // Букви в інпуті з'являються МИТТЄВО
     debouncedSearch(text); // Запит на сервер піде через 500 мс
-    setPage(1); // Скидаємо сторінку на першу
   };
 
   // Безпечно витягуємо дані з об'єкта відповіді useQuery, задаючи дефолтні значення
